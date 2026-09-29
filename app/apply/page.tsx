@@ -6,7 +6,24 @@ import EscapeBack from "@/components/EscapeBack";
 async function submitLead(formData: FormData) {
     "use server";
     const data = Object.fromEntries(formData.entries());
-    console.log("LEAD:", data);
+
+    const db = (await import("@/lib/db")).default;
+
+    db.prepare(`
+    INSERT INTO leads (name, phone, company, region, product, trade_in, note, ref)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+        data.name,
+        data.phone,
+        data.company || null,
+        data.region || null,
+        data.product || null,
+        data.tradeIn === "yes" ? 1 : 0,
+        data.note || null,
+        data.ref || null
+    );
+
+    console.log("线索已保存:", data);
 }
 
 export default function ApplyPage() {

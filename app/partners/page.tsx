@@ -1,8 +1,24 @@
 import EscapeBack from "@/components/EscapeBack";
+
+
 async function submitPartner(formData: FormData) {
     "use server";
     const data = Object.fromEntries(formData.entries());
-    console.log("PARTNER:", data);
+
+    const db = (await import("@/lib/db")).default;
+
+    db.prepare(`
+    INSERT INTO leads (name, phone, region, note, ref)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(
+        data.name,
+        data.phone,
+        data.region || null,
+        `渠道类型：${data.channelType || "未填"}；预计月推荐量：${data.volume || "未填"}；${data.note || ""}`,
+        "channel"
+    );
+
+    console.log("渠道线索已保存:", data);
 }
 
 export default function PartnersPage() {
