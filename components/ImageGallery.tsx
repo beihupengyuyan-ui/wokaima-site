@@ -80,5 +80,7 @@ export default function ImageGallery({
                 </div>
             )}
         </>
+
+
     );
 }

@@ -235,6 +235,8 @@ export default function Home() {
                         </p>
                     </Reveal>
 
+
+
                     <Reveal delay={0.1}>
                         <div className="mt-12 max-w-5xl mx-auto">
                             <ImageGallery

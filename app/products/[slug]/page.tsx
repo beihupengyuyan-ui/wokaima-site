@@ -83,6 +83,7 @@ export default async function ProductDetail({
                     )}
                 </div>
 
+
                 {/* 产品图：单图限制宽度，多图放宽容器 */}
                 {product.images.length > 0 && (
                     <div

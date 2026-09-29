@@ -63,6 +63,8 @@ export const products: Product[] = [
         monthlyRent: 210,
         priceUnit: "/ 眼 / 月",
         leaseTerm: "36个月",
+
+
         specs: {
             计价方式: "按灶眼",
             灶眼数量: "单眼 / 双眼 / 三眼",
