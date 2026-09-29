@@ -2,6 +2,7 @@ import { products, getProductBySlug } from "@/data/products";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import EscapeBack from "@/components/EscapeBack";
+import ImageGallery from "@/components/ImageGallery";
 
 export function generateStaticParams() {
     return products.map((p) => ({ slug: p.slug }));
@@ -37,31 +38,67 @@ export default async function ProductDetail({
                     </h1>
                     <p className="mt-3 text-lg text-gray-500">{product.tagline}</p>
 
-                    <div className="mt-6 flex items-baseline gap-3">
-                        <span className="text-5xl font-bold text-orange-600">¥{product.monthlyRent}</span>
-                        <span className="text-lg text-gray-500">/ 月</span>
-                    </div>
-                    <p className="mt-2 text-gray-500">
-                        租期 {product.leaseTerm} · 租满归你 · 不占用现金流
-                    </p>
+                    {/* 单一定价（蒸柜） */}
+                    {product.slug !== "energy-wok-range" && (
+                        <div className="mt-6">
+                            <div className="flex items-baseline gap-3">
+                <span className="text-5xl font-bold text-orange-600">
+                  ¥{product.monthlyRent}
+                </span>
+                                <span className="text-lg text-gray-500">{product.priceUnit}</span>
+                            </div>
+                            <p className="mt-2 text-gray-500">
+                                租期 {product.leaseTerm} · 租满归你
+                            </p>
+                        </div>
+                    )}
+
+                    {/* 双方案定价（炒灶） */}
+                    {product.slug === "energy-wok-range" && (
+                        <div className="mt-6 grid md:grid-cols-2 gap-4 max-w-2xl">
+                            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)] border-2 border-orange-500">
+                                <p className="text-xs text-orange-600 font-semibold">整灶定制</p>
+                                <div className="mt-3 flex items-baseline gap-2">
+                                    <span className="text-4xl font-bold text-orange-600">¥210</span>
+                                    <span className="text-sm text-gray-500">/ 眼 / 月</span>
+                                </div>
+                                <p className="mt-2 text-sm text-gray-500">7 元/眼/天</p>
+                                <p className="mt-1 text-xs text-gray-400">根据现场尺寸定制安装</p>
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+                                <p className="text-xs text-gray-500 font-semibold">只换炉心</p>
+                                <div className="mt-3 flex items-baseline gap-2">
+                                    <span className="text-4xl font-bold text-gray-900">¥150</span>
+                                    <span className="text-sm text-gray-500">/ 眼 / 月</span>
+                                </div>
+                                <p className="mt-2 text-sm text-gray-500">5 元/眼/天</p>
+                                <p className="mt-1 text-xs text-gray-400">保留原灶，只换内部炉心</p>
+                            </div>
+
+                            <p className="md:col-span-2 mt-2 text-gray-500 text-sm">
+                                租期 {product.leaseTerm} · 租满归你
+                            </p>
+                        </div>
+                    )}
                 </div>
 
-                {/* 产品图 */}
+                {/* 产品图：单图限制宽度，多图放宽容器 */}
                 {product.images.length > 0 && (
                     <div
-                        className="mt-10 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-10 flex items-center justify-center animate-fade-in-up"
-                        style={{ animationDelay: "0.08s" }}
+                        className={`mt-10 mx-auto ${
+                            product.images.length === 1 ? "max-w-xl" : "max-w-4xl"
+                        }`}
                     >
-                        <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="max-h-96 w-auto object-contain"
-                        />
+                        <ImageGallery images={product.images} productName={product.name} />
                     </div>
                 )}
 
                 {/* 技术规格 */}
-                <div className="mt-10 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+                <div
+                    className="mt-10 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
+                    style={{ animationDelay: "0.2s" }}
+                >
                     <h2 className="font-semibold text-lg text-gray-900 mb-5">技术规格</h2>
                     <dl className="grid md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
                         {Object.entries(product.specs).map(([k, v]) => (
@@ -74,7 +111,10 @@ export default async function ProductDetail({
                 </div>
 
                 {/* 核心卖点 */}
-                <div className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+                <div
+                    className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
+                    style={{ animationDelay: "0.25s" }}
+                >
                     <h2 className="font-semibold text-lg text-gray-900 mb-5">核心卖点</h2>
                     <ul className="space-y-3 text-sm">
                         {product.features.map((f) => (
@@ -86,30 +126,18 @@ export default async function ProductDetail({
                     </ul>
                 </div>
 
-                {/* 节能数据 */}
-                {product.energySaving.length > 0 && (
-                    <div className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-                        <h2 className="font-semibold text-lg text-gray-900 mb-5">节能效果</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            {product.energySaving.map((item) => (
-                                <div key={item.label} className="bg-orange-50 rounded-2xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">{item.label}</p>
-                                    <p className="mt-2 text-lg font-bold text-orange-600">{item.value}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* 经济性对比 */}
+                {/* 计价方式 */}
                 {product.economy.length > 0 && (
-                    <div className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up" style={{ animationDelay: "0.25s" }}>
-                        <h2 className="font-semibold text-lg text-gray-900 mb-5">经济性对比</h2>
+                    <div
+                        className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
+                        style={{ animationDelay: "0.3s" }}
+                    >
+                        <h2 className="font-semibold text-lg text-gray-900 mb-5">计价方式</h2>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             {product.economy.map((item) => (
-                                <div key={item.label} className="bg-gray-50 rounded-2xl p-4">
+                                <div key={item.label} className="bg-orange-50 rounded-2xl p-4">
                                     <p className="text-xs text-gray-500">{item.label}</p>
-                                    <p className="mt-2 font-semibold text-gray-900">{item.value}</p>
+                                    <p className="mt-2 font-semibold text-orange-600">{item.value}</p>
                                 </div>
                             ))}
                         </div>
@@ -117,7 +145,10 @@ export default async function ProductDetail({
                 )}
 
                 {/* 售后维保 */}
-                <div className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
+                <div
+                    className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
+                    style={{ animationDelay: "0.35s" }}
+                >
                     <h2 className="font-semibold text-lg text-gray-900 mb-5">售后维保</h2>
                     <div className="space-y-4 text-sm text-gray-600">
                         <div>
@@ -132,7 +163,7 @@ export default async function ProductDetail({
                 </div>
 
                 {/* CTA */}
-                <div className="mt-10 text-center animate-fade-in-up" style={{ animationDelay: "0.35s" }}>
+                <div className="mt-10 text-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
                     <Link
                         href={`/apply?product=${product.slug}`}
                         className="inline-block rounded-2xl bg-orange-600 px-10 py-4 text-white font-semibold text-lg hover:bg-orange-700 hover:shadow-xl hover:shadow-orange-600/30 active:scale-[0.97] transition-all duration-200"

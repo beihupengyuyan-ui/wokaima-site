@@ -5,6 +5,7 @@ export type Product = {
     tagline: string;
     monthlyRent: number;
     leaseTerm: string;
+    priceUnit: string;
     specs: Record<string, string>;
     features: string[];
     energySaving: { label: string; value: string }[];
@@ -19,6 +20,7 @@ export const products: Product[] = [
         category: "蒸柜",
         tagline: "热效率 95% 以上，综合节能 67%",
         monthlyRent: 900,
+        priceUnit: "/ 月",
         leaseTerm: "36个月",
         specs: {
             电压: "220V",
@@ -54,45 +56,40 @@ export const products: Product[] = [
         images: ["/images/products/steamer-d3.png"],
     },
     {
-        slug: "energy-burner-single",
-        name: "单眼节能炉头",
-        category: "炉头",
-        tagline: "热效率提升 30% 以上",
-        monthlyRent: 900,
-        leaseTerm: "36个月",
-        specs: {
-            类型: "单眼",
-            控制: "独立控制",
-        },
-        features: [
-            "热效率提升 30% 以上",
-            "单眼独立控制，火力猛且省气",
-            "灵活适配各类灶台布局",
-        ],
-        energySaving: [],
-        economy: [],
-        images: ["/images/burner-single.webp"],
-    },
-    {
-        slug: "energy-stove-single",
-        name: "节能整灶单眼",
+        slug: "energy-wok-range",
+        name: "节能炒灶",
         category: "整灶",
-        tagline: "综合节能率高达 40%",
-        monthlyRent: 900,
+        tagline: "按灶眼计价，整灶定制或只换炉心",
+        monthlyRent: 210,
+        priceUnit: "/ 眼 / 月",
         leaseTerm: "36个月",
         specs: {
-            类型: "单眼",
-            设计: "烟灶一体化",
-            技术: "聚能环加热",
+            计价方式: "按灶眼",
+            灶眼数量: "单眼 / 双眼 / 三眼",
+            尺寸: "1米 / 1.2米 / 1.8米 / 2米",
+            水沟: "单水沟 / 双水沟",
+            定制: "根据现场尺寸定制",
         },
         features: [
-            "烟灶一体化专业设计",
-            "聚能环加热技术",
-            "综合节能率高达 40%",
+            "整灶定制：7 元/眼/天，210 元/眼/月",
+            "只换炉心：5 元/眼/天，150 元/眼/月",
+            "保留原灶，只换内部炉心，改造成本更低",
+            "单眼、双眼、三眼均可定制",
+            "宽度可选 1米 / 1.2米 / 1.8米 / 2米",
+            "可选单水沟或双水沟",
+            "租满三年买断",
         ],
         energySaving: [],
-        economy: [],
-        images: ["/images/stove-single.webp"],
+        economy: [
+            { label: "整灶定制", value: "7 元/眼/天" },
+            { label: "只换炉心", value: "5 元/眼/天" },
+            { label: "整灶月租", value: "210 元/眼/月" },
+            { label: "炉心月租", value: "150 元/眼/月" },
+        ],
+        images: [
+            "/images/products/wok-range-flame.png",
+            "/images/products/wok-range-detail.png",
+        ],
     },
 ];
 

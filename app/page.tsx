@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { products } from "@/data/products";
 import Reveal from "@/components/Reveal";
+import ImageGallery from "@/components/ImageGallery";
 
 export default function Home() {
     return (
@@ -122,11 +123,11 @@ export default function Home() {
             {/* 产品 */}
             <section className="max-w-5xl mx-auto px-4 py-20">
                 <Reveal>
-                    <h2 className="text-3xl font-bold text-center text-gray-900">三大核心产品</h2>
+                    <h2 className="text-3xl font-bold text-center text-gray-900">两大核心产品</h2>
                     <p className="text-center text-gray-500 mt-3">全部支持以租代售，租满三年归你</p>
                 </Reveal>
 
-                <div className="mt-12 grid md:grid-cols-3 gap-6">
+                <div className="mt-12 grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                     {products.map((p, i) => (
                         <Reveal key={p.slug} delay={0.1 + i * 0.08}>
                             <Link
@@ -142,7 +143,7 @@ export default function Home() {
                                 <p className="text-sm text-gray-500 mt-2">{p.tagline}</p>
                                 <div className="mt-6 flex items-baseline gap-2">
                                     <span className="text-3xl font-bold text-orange-600">¥{p.monthlyRent}</span>
-                                    <span className="text-sm text-gray-500">/ 月</span>
+                                    <span className="text-sm text-gray-500">{p.priceUnit}</span>
                                 </div>
                                 <p className="text-xs text-gray-400 mt-1">租期 {p.leaseTerm}，租满归你</p>
                             </Link>
@@ -235,11 +236,10 @@ export default function Home() {
                     </Reveal>
 
                     <Reveal delay={0.1}>
-                        <div className="mt-12">
-                            <img
-                                src="/images/cases/partners.png"
-                                alt="沃凯玛工程案例"
-                                className="w-full rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.08)]"
+                        <div className="mt-12 max-w-5xl mx-auto">
+                            <ImageGallery
+                                images={["/images/cases/partners.png"]}
+                                productName="沃凯玛工程案例"
                             />
                         </div>
                     </Reveal>
