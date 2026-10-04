@@ -1,8 +1,13 @@
 export type Product = {
     slug: string;
     name: string;
-    category: "蒸柜" | "炉头" | "整灶";
+    category: "蒸柜" | "炉头" | "整灶" | "工作台";
     tagline: string;
+    /** 日租价：出租主题下的核心价格 */
+    dailyRent: number;
+    /** 日租价单位，例如「元 / 天」「元 / 眼 / 天」 */
+    dailyRentUnit: string;
+    /** 月租价：日租 × 30 的参考月供 */
     monthlyRent: number;
     leaseTerm: string;
     priceUnit: string;
@@ -19,9 +24,11 @@ export const products: Product[] = [
         name: "沃凯玛智能燃气三门蒸柜",
         category: "蒸柜",
         tagline: "热效率 95% 以上，综合节能 67%",
+        dailyRent: 30,
+        dailyRentUnit: "元 / 天",
         monthlyRent: 900,
         priceUnit: "/ 月",
-        leaseTerm: "36个月",
+        leaseTerm: "36 个月",
         specs: {
             电压: "220V",
             功率: "36KW",
@@ -60,9 +67,11 @@ export const products: Product[] = [
         name: "节能炒灶",
         category: "整灶",
         tagline: "按灶眼计价，整灶定制或只换炉心",
+        dailyRent: 7,
+        dailyRentUnit: "元 / 眼 / 天",
         monthlyRent: 210,
         priceUnit: "/ 眼 / 月",
-        leaseTerm: "36个月",
+        leaseTerm: "36 个月",
 
 
         specs: {
@@ -73,13 +82,11 @@ export const products: Product[] = [
             定制: "根据现场尺寸定制",
         },
         features: [
-            "整灶定制：7 元/眼/天，210 元/眼/月",
-            "只换炉心：5 元/眼/天，150 元/眼/月",
             "保留原灶，只换内部炉心，改造成本更低",
             "单眼、双眼、三眼均可定制",
             "宽度可选 1米 / 1.2米 / 1.8米 / 2米",
             "可选单水沟或双水沟",
-            "租满三年买断",
+            "租满 36 期设备归你",
         ],
         energySaving: [],
         economy: [
@@ -92,6 +99,41 @@ export const products: Product[] = [
             "/images/products/wok-range-flame.png",
             "/images/products/wok-range-detail.png",
         ],
+    },
+    {
+        slug: "stainless-work-table",
+        name: "不锈钢工作台",
+        category: "工作台",
+        tagline: "按米出租，1 元/天起，多尺寸可选",
+        dailyRent: 1,
+        dailyRentUnit: "元 / 天",
+        monthlyRent: 30,
+        priceUnit: "/ 月",
+        leaseTerm: "36 个月",
+        specs: {
+            材质: "食品级 304 不锈钢",
+            计价方式: "按米 / 按台",
+            长度: "1.0米 / 1.2米 / 1.5米 / 1.8米",
+            台面: "平板 / 后挡水 / 带层板",
+            脚架: "不锈钢方管，可调脚杯",
+            定制: "可根据现场尺寸定制",
+        },
+        features: [
+            "1 元/天起，按月付费，租金从营业额里出",
+            "食品级 304 不锈钢，耐腐蚀易清洁",
+            "平板 / 后挡水 / 带层板多种台面可选",
+            "长度 1.0-1.8 米可选，也可按现场尺寸定制",
+            "免费送货、免费上门安装",
+            "租满 36 期设备归你",
+        ],
+        energySaving: [],
+        economy: [
+            { label: "工作台日租", value: "1 元/天起" },
+            { label: "工作台月租", value: "30 元/月起" },
+            { label: "租期", value: "36 个月" },
+            { label: "安装运输", value: "免费" },
+        ],
+        images: [],
     },
 ];
 

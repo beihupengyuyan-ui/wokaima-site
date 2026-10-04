@@ -1,6 +1,3 @@
-import EscapeBack from "@/components/EscapeBack";
-
-
 async function submitPartner(formData: FormData) {
     "use server";
     const data = Object.fromEntries(formData.entries());
@@ -24,8 +21,7 @@ async function submitPartner(formData: FormData) {
 export default function PartnersPage() {
     return (
         <div className="min-h-screen bg-[#fafafa]">
-            <EscapeBack />
-            <div className="max-w-2xl mx-auto px-6 py-20">
+            <div className="max-w-2xl mx-auto px-6 py-24 md:py-36">
                 {/* 标题区 */}
                 <div className="text-center mb-12 animate-fade-in-up">
                     <h1 className="text-4xl font-semibold tracking-tight text-gray-900">
@@ -140,7 +136,7 @@ export default function PartnersPage() {
                     </button>
                 </form>
 
-                <p className="text-center text-xs text-gray-400 mt-8">
+                <p className="text-center text-xs text-gray-500 mt-8">
                     提交后我们会在 1 个工作日内联系你。
                 </p>
             </div>

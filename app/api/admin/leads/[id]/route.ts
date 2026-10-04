@@ -17,9 +17,17 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
 
-    if (status && ["new", "contacted", "converted", "lost"].includes(status)) {
+    if (status && ["pending", "processing", "done"].includes(status)) {
         db.prepare("UPDATE leads SET status = ? WHERE id = ?").run(status, id);
     }
 
-    return NextResponse.redirect(new URL("/admin/leads", request.url));
+    const redirectMap: Record<string, string> = {
+        pending: "/admin/leads/pending",
+        processing: "/admin/leads/processing",
+        done: "/admin/leads/done",
+    };
+
+    return NextResponse.redirect(
+        new URL(redirectMap[status || "pending"] || "/admin/leads/pending", request.url)
+    );
 }

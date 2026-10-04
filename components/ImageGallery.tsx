@@ -64,6 +64,9 @@ export default function ImageGallery({
                 <div
                     className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center cursor-zoom-out animate-fade-in"
                     onClick={() => setOpenIndex(null)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="图片预览"
                 >
                     <img
                         src={images[openIndex]}

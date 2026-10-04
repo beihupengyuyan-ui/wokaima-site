@@ -5,11 +5,45 @@
     --foreground: #171717;
 }
 
+/* 字体栈：Inter 只覆盖拉丁字母与数字（构建产物里它的所有 unicode-range 都在 U+2BA 以下，
+   汉字不在任何子集内），而 next/font 生成的 "Inter Fallback" 是 local(Arial) +
+   size-adjust:107.12%，Arial 同样没有汉字。于是汉字会掉到浏览器最后兜底的系统 CJK 字体，
+   且不参与任何度量补偿 —— 结果是同一行里数字是被放大 7% 的 Inter、汉字是另一套 x-height
+   和基线的字体（如「¥30 / 天 起」）。这里显式补上 CJK 字族，把度量纳入自己控制。
+
+   字族名必须写对：是 "Noto Sans SC"，不是 "Noto Sans CJK SC"。
+   后者在任何系统上都不存在（Noto Sans CJK 是上游项目名，不是 Windows/macOS 注册的字族名），
+   写了等于没写，汉字会穿过它继续往后回退 ——「改了字体却看不出变化」通常就是这个原因。
+   本机注册表实测：Noto Sans SC => NotoSansSC-VF.ttf。
+
+   顺序理由：PingFang SC（macOS/iOS 最佳）→ Noto Sans SC = 思源黑体（可变字体，
+   600/700 走真实字重轴；而 YaHei 只有 msyh.ttc 400 + msyhbd.ttc 700 两个字面，
+   font-semibold 只能被四舍五入或合成）→ Microsoft YaHei UI → Microsoft YaHei。 */
+html {
+    font-family:
+            var(--font-inter),
+            "PingFang SC",
+            "Noto Sans SC",
+            "Source Han Sans SC",
+            "Hiragino Sans GB",
+            "Microsoft YaHei UI",
+            "Microsoft YaHei",
+            system-ui,
+            -apple-system,
+            "Segoe UI",
+            Roboto,
+            "Helvetica Neue",
+            Arial,
+            sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 body {
     background: var(--background);
     color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
 }
+
 input,
 select,
 textarea,
@@ -17,6 +51,22 @@ button,
 a {
     transition: all 0.2s ease-out;
 }
+
+/* ========== 动画 ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.25s ease-out both;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -32,19 +82,18 @@ a {
     animation: fadeInUp 0.6s ease-out both;
 }
 
-/* 几何装饰 */
+/* ========== 几何装饰 ========== */
+
 .geo-blur {
     position: absolute;
     border-radius: 9999px;
-    background: radial-gradient(circle, rgba(249, 115, 22, 0.25) 0%, rgba(249, 115, 22, 0.05) 60%, transparent 100%);
+    background: radial-gradient(
+            circle,
+            rgba(249, 115, 22, 0.35) 0%,
+            rgba(249, 115, 22, 0.12) 50%,
+            transparent 80%
+    );
     filter: blur(100px);
-    pointer-events: none;
-}
-
-.geo-circle {
-    position: absolute;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 30% 30%, rgba(249, 115, 22, 0.2), rgba(249, 115, 22, 0.03));
     pointer-events: none;
 }
 
@@ -53,17 +102,60 @@ a {
     inset: 0;
     background-image: radial-gradient(rgba(249, 115, 22, 0.15) 1px, transparent 1px);
     background-size: 32px 32px;
-    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    /* 必须带 -webkit- 前缀：Chrome 直到 120 才支持无前缀 mask-image，
+       只写标准属性的话旧版 Chrome / Safari<15.4 会整块忽略遮罩，
+       点阵会渲染成一个硬边方块而不是向外淡出。 */
+    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
     pointer-events: none;
 }
 
+/* ========== 出租主题增强 ========== */
 
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+/* 暖色渐变文字
+   原中间色 #f59e0b 在纯白底上对比度只有 2.15:1（连大字号的 3:1 都不够），
+   而它正好落在 45% 处 —— 首屏标题「厨具按天租」的中间两个字是最糊的地方。
+   改后三个色标分别为 3.56:1 / 5.18:1 / 5.02:1，全部达标；
+   最亮的一档仍是品牌既有的 orange-600，暖色语言不变。 */
+.text-gradient-warm {
+    background-image: linear-gradient(115deg, #ea580c 0%, #c2410c 50%, #b45309 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
-.animate-fade-in {
-    animation: fadeIn 0.25s ease-out;
+/* 更柔和的暖色光斑 */
+.geo-blur-soft {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(
+            circle,
+            rgba(251, 191, 36, 0.35) 0%,
+            rgba(249, 115, 22, 0.12) 55%,
+            transparent 80%
+    );
+    filter: blur(110px);
+    pointer-events: none;
+}
+
+/* 深色区块点阵 */
+.geo-grid-dark {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 36px 36px;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+    mask-image: radial-gradient(ellipse at center, black 10%, transparent 72%);
+    pointer-events: none;
+}
+
+/* 卡片悬浮 */
+.card-lift {
+    transition: transform 0.5s ease-out, box-shadow 0.5s ease-out, border-color 0.5s ease-out;
+}
+
+.card-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 70px rgba(234, 88, 12, 0.14);
 }

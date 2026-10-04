@@ -1,7 +1,6 @@
 import { products, getProductBySlug } from "@/data/products";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import EscapeBack from "@/components/EscapeBack";
 import ImageGallery from "@/components/ImageGallery";
 
 export function generateStaticParams() {
@@ -19,8 +18,7 @@ export default async function ProductDetail({
 
     return (
         <div className="min-h-screen bg-[#fafafa]">
-            <EscapeBack />
-            <div className="max-w-4xl mx-auto px-6 py-20">
+            <div className="max-w-4xl mx-auto px-6 py-24 md:py-32">
                 <Link
                     href="/products"
                     className="inline-flex items-center text-sm text-gray-500 hover:text-orange-600 transition-colors animate-fade-in-up"
@@ -38,17 +36,18 @@ export default async function ProductDetail({
                     </h1>
                     <p className="mt-3 text-lg text-gray-500">{product.tagline}</p>
 
-                    {/* 单一定价（蒸柜） */}
+                    {/* 日租价（出租主题核心价格） */}
                     {product.slug !== "energy-wok-range" && (
                         <div className="mt-6">
                             <div className="flex items-baseline gap-3">
-                <span className="text-5xl font-bold text-orange-600">
-                  ¥{product.monthlyRent}
-                </span>
-                                <span className="text-lg text-gray-500">{product.priceUnit}</span>
+                                <span className="text-5xl font-bold text-orange-600 md:text-6xl">
+                                    ¥{product.dailyRent}
+                                </span>
+                                <span className="text-lg text-gray-500">{product.dailyRentUnit}</span>
                             </div>
-                            <p className="mt-2 text-gray-500">
-                                租期 {product.leaseTerm} · 租满归你
+                            <p className="mt-3 text-gray-500">
+                                约 ¥{product.monthlyRent}
+                                {product.priceUnit} · 租期 {product.leaseTerm} · 租满归你
                             </p>
                         </div>
                     )}
@@ -59,20 +58,20 @@ export default async function ProductDetail({
                             <div className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)] border-2 border-orange-500">
                                 <p className="text-xs text-orange-600 font-semibold">整灶定制</p>
                                 <div className="mt-3 flex items-baseline gap-2">
-                                    <span className="text-4xl font-bold text-orange-600">¥210</span>
-                                    <span className="text-sm text-gray-500">/ 眼 / 月</span>
+                                    <span className="text-4xl font-bold text-orange-600">¥7</span>
+                                    <span className="text-sm text-gray-500">/ 眼 / 天</span>
                                 </div>
-                                <p className="mt-2 text-sm text-gray-500">7 元/眼/天</p>
+                                <p className="mt-2 text-sm text-gray-500">约 ¥210 / 眼 / 月</p>
                                 <p className="mt-1 text-xs text-gray-400">根据现场尺寸定制安装</p>
                             </div>
 
                             <div className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
                                 <p className="text-xs text-gray-500 font-semibold">只换炉心</p>
                                 <div className="mt-3 flex items-baseline gap-2">
-                                    <span className="text-4xl font-bold text-gray-900">¥150</span>
-                                    <span className="text-sm text-gray-500">/ 眼 / 月</span>
+                                    <span className="text-4xl font-bold text-gray-900">¥5</span>
+                                    <span className="text-sm text-gray-500">/ 眼 / 天</span>
                                 </div>
-                                <p className="mt-2 text-sm text-gray-500">5 元/眼/天</p>
+                                <p className="mt-2 text-sm text-gray-500">约 ¥150 / 眼 / 月</p>
                                 <p className="mt-1 text-xs text-gray-400">保留原灶，只换内部炉心</p>
                             </div>
 
@@ -126,6 +125,28 @@ export default async function ProductDetail({
                         ))}
                     </ul>
                 </div>
+
+                {/* 节能测算：数据来自 products.ts 的 energySaving，只有蒸柜有，其余品类不渲染 */}
+                {product.energySaving.length > 0 && (
+                    <div
+                        className="mt-6 bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
+                        style={{ animationDelay: "0.28s" }}
+                    >
+                        <h2 className="font-semibold text-lg text-gray-900 mb-5">节能测算</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            {product.energySaving.map((item) => (
+                                <div key={item.label} className="bg-orange-50 rounded-2xl p-4">
+                                    <p className="text-xs text-gray-500">{item.label}</p>
+                                    <p className="mt-2 font-semibold text-orange-600">{item.value}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-5 text-xs text-gray-400 leading-relaxed">
+                            测算口径：与普通蒸柜（5.2 方/小时）对比，按每天运行 8 小时、天然气 4 元/方计算。
+                            实际用量随菜品结构和使用强度浮动。
+                        </p>
+                    </div>
+                )}
 
                 {/* 计价方式 */}
                 {product.economy.length > 0 && (

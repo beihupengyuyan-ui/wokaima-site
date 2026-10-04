@@ -1,11 +1,9 @@
 import Link from "next/link";
-import EscapeBack from "@/components/EscapeBack";
 
 export default function HonorsPage() {
     return (
         <div className="min-h-screen bg-[#fafafa]">
-            <EscapeBack />
-            <div className="max-w-7xl mx-auto px-6 py-20">
+            <div className="max-w-7xl mx-auto px-6 py-24 md:py-36">
                 <div className="text-center mb-14 animate-fade-in-up">
                     <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
                         企业荣誉

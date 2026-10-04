@@ -1,11 +1,9 @@
 import Link from "next/link";
-import EscapeBack from "@/components/EscapeBack";
 
 export default function CleanKitchenPage() {
     return (
         <div className="min-h-screen bg-[#fafafa]">
-            <EscapeBack />
-            <div className="max-w-3xl mx-auto px-6 py-20">
+            <div className="max-w-3xl mx-auto px-6 py-24 md:py-36">
                 <div className="text-center mb-14 animate-fade-in-up">
                     <div className="text-6xl">❄️</div>
                     <h1 className="mt-6 text-4xl font-semibold tracking-tight text-gray-900">
@@ -16,7 +14,7 @@ export default function CleanKitchenPage() {
                     </p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div
                         className="bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 animate-fade-in-up"
                         style={{ animationDelay: "0.05s" }}
