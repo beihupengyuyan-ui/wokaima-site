@@ -23,10 +23,14 @@
 在服务器 `.env.local`（或 pm2 的 env）里补三项，然后 `pm2 restart wokaima --update-env`：
 
 ```bash
-WX_APPID=wx514db8ad05cb3b6f
+WX_APPID=wx 开头的 18 位 AppID（真实值见 .env.local，不要提交进仓库）
 WX_SECRET=微信公众平台 → 开发管理 → 开发设置 → AppSecret
 MINI_TOKEN_SECRET=随便一串长随机字符串（本地和服务器各自独立即可）
 ```
+
+> 提交前自检（避免误提交密钥）：`git diff --cached | Select-String 'wx[0-9a-f]{16}|[0-9a-f]{32}'` —— 有命中就说明有密钥形态的串进了暂存区。
+> 注意：**AppID 也会被 GitHub 密钥扫描识别成 `Tencent WeChat API App ID` 并告警，那是误报**（AppID 是公开标识，单独拿到换不到 access_token），
+> 在仓库 Security → Secret scanning 里把该告警 Dismiss 成 False positive 即可。
 
 ⚠️ `WX_SECRET` **只能放服务端**，绝不能写进小程序代码。
 
