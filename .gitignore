@@ -42,3 +42,5 @@ next-env.d.ts
 
 #test data
 data/wokaima.db
+data/wokaima.db-wal
+data/wokaima.db-shm
