@@ -60,6 +60,11 @@ npm run build
 pm2 restart wokaima
 ```
 
+> 更省事：仓库里已带一键脚本 `scripts/deploy.sh`，在服务器上执行 `bash scripts/deploy.sh`
+> 即可完成上面全部步骤（额外含数据库备份、迁移与部署后自检）；`package.json` 有改动时用
+> `bash scripts/deploy.sh --install`。脚本发现服务器有未提交改动会直接拒绝执行，
+> 避免「git pull 失败了、但仍在用旧代码构建」这种最隐蔽的线上不更新。
+
 ## 4. 部署后自测（照着敲，看到什么就是什么）
 
 ```bash
