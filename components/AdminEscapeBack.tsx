@@ -31,7 +31,8 @@ export default function AdminEscapeBack() {
             // 在列表 tab 页按 Esc，回到“待处理”
             if (
                 pathname === "/admin/leads/processing" ||
-                pathname === "/admin/leads/done"
+                pathname === "/admin/leads/done" ||
+                pathname === "/admin/leads/cancelled"
             ) {
                 router.push("/admin/leads/pending");
                 return;

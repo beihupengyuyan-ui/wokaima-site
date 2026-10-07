@@ -1,12 +1,19 @@
 /**
- * 小程序专用公共逻辑（只被 app/api/mini/** 使用，不影响官网与 admin 现有逻辑）
+ * 小程序专用公共逻辑（只被 app/api/mini/** 与 lib/site-orders.ts 使用，不影响官网页面与 admin 现有逻辑）
  * - 商品：把 data/products.ts 转成小程序结构（specs 转数组、slug→id、补 unit/emoji/monthText）
  * - 登录：HMAC-SHA256 自签无状态令牌，服务端不存 session
  * - 订单：leads 行 ↔ 小程序订单结构互转（复用 leads 表，admin 后台零改造）
+ *
+ * 注意：本文件引了 node:crypto，客户端组件绝不能 import（状态文案等纯常量在 lib/order-status.ts，
+ * 时间/JSON 小工具在 lib/lead-utils.ts，下面只做再导出，调用点不必改）。
  */
 import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { products as sourceProducts } from "@/data/products";
+import { bjText, nowUtc, safeParse, utcToMs } from "@/lib/lead-utils";
+import { statusOf, STATUS_ALIAS, STATUS_TEXT } from "@/lib/order-status";
+
+export { bjText, nowUtc, safeParse, utcToMs, statusOf, STATUS_ALIAS, STATUS_TEXT };
 
 const DEV_TOKEN_SECRET = "wokaima-mini-dev-secret";
 const TOKEN_TTL = 7 * 24 * 3600; // 7 天
@@ -37,21 +44,7 @@ export function tokenSecretReady(): boolean {
     return Boolean((process.env.MINI_TOKEN_SECRET || "").trim());
 }
 
-/** 与小程序 utils/orders.js 的 STATUS_TEXT 完全一致 */
-export const STATUS_TEXT: Record<string, string> = {
-    pending: "待确认",
-    processing: "已受理",
-    done: "已完成",
-    cancelled: "已取消",
-};
-
-/** 老数据兼容：new/contacted/converted/lost → pending/processing/done */
-export const STATUS_ALIAS: Record<string, string> = {
-    new: "pending",
-    contacted: "processing",
-    converted: "done",
-    lost: "done",
-};
+/* 状态文案与老数据别名见 @/lib/order-status（本文件在上面再导出，小程序路由的 import 路径不必改） */
 
 const UNIT_BY_CATEGORY: Record<string, string> = {
     蒸柜: "台",
@@ -116,26 +109,7 @@ export function genOrderNo(date = new Date()) {
     );
 }
 
-/** 当前 UTC 时间，格式 YYYY-MM-DD HH:mm:ss（与 leads.created_at 一致） */
-export function nowUtc() {
-    return new Date().toISOString().slice(0, 19).replace("T", " ");
-}
-
-/** UTC 字符串 → 毫秒时间戳（小程序端直接用这个展示） */
-export function utcToMs(value: string | null | undefined) {
-    if (!value) return Date.now();
-    const d = new Date(value.replace(" ", "T") + "Z");
-    return Number.isNaN(d.getTime()) ? Date.now() : d.getTime();
-}
-
-export function safeParse<T>(value: unknown, fallback: T): T {
-    if (typeof value !== "string" || !value.trim()) return fallback;
-    try {
-        return JSON.parse(value) as T;
-    } catch {
-        return fallback;
-    }
-}
+/* nowUtc / utcToMs / safeParse 见 @/lib/lead-utils（本文件在上面再导出） */
 
 /** 签发令牌：base64url(openid.exp) + "." + HMAC-SHA256 签名 */
 export function signToken(openid: string, ttl = TOKEN_TTL) {
@@ -237,9 +211,7 @@ export function rowToOrder(row: LeadRow) {
     const product = miniProducts.find((p) => p.id === productId) || null;
     const qty = Number(first?.qty) > 0 ? Number(first?.qty) : 1;
 
-    const cancelled = row.sub_status === "已放弃";
-    const baseStatus = STATUS_ALIAS[row.status || ""] || row.status || "pending";
-    const status = cancelled ? "cancelled" : baseStatus;
+    const status = statusOf(row);
 
     const full = row.region || "";
     const address = row.address || "";

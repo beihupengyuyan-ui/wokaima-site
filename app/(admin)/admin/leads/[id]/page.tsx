@@ -4,6 +4,7 @@ import db from "@/lib/db";
 import Link from "next/link";
 import LeadWorkspace from "@/components/LeadWorkspace";
 import Reveal from "@/components/Reveal";
+import { isCancelled } from "@/lib/lead-status";
 
 export const dynamic = "force-dynamic";
 
@@ -49,11 +50,20 @@ export default async function LeadDetailPage({
 
     const tags: string[] = lead.tags ? JSON.parse(lead.tags) : [];
 
+    // 返回对应的页签：已取消的线索回「已取消」列表，其余按主状态归类
+    const backHref = isCancelled(lead)
+        ? "/admin/leads/cancelled"
+        : lead.status === "processing" || lead.status === "contacted"
+            ? "/admin/leads/processing"
+            : lead.status === "pending" || lead.status === "new"
+                ? "/admin/leads/pending"
+                : "/admin/leads/done";
+
     return (
         <div className="min-h-screen bg-[#fafafa]">
             <div className="max-w-4xl mx-auto px-6 py-12">
                 <Link
-                    href="/admin/leads/pending"
+                    href={backHref}
                     className="text-sm text-gray-500 hover:text-orange-600"
                 >
                     ← 返回列表

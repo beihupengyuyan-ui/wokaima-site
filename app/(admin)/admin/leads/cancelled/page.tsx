@@ -4,11 +4,11 @@ import LeadCard from "@/components/LeadCard";
 import LeadsTabs from "@/components/LeadsTabs";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
-import { leadCounts, listDoneLeads } from "@/lib/leads";
+import { leadCounts, listCancelledLeads } from "@/lib/leads";
 
 export const dynamic = "force-dynamic";
 
-export default async function DonePage() {
+export default async function CancelledPage() {
     const cookieStore = await cookies();
     const auth = cookieStore.get("admin_auth");
 
@@ -16,8 +16,9 @@ export default async function DonePage() {
         redirect("/admin");
     }
 
-    // 已取消的订单不在这里显示，统一收进 /admin/leads/cancelled
-    const leads = listDoneLeads();
+    // 用户在小程序取消（sub_status=已放弃）与后台标记放弃的线索都收在这里，
+    // 不再出现在 待处理 / 处理中 / 已完成 三个列表里
+    const leads = listCancelledLeads();
     const counts = leadCounts();
 
     return (
@@ -26,7 +27,7 @@ export default async function DonePage() {
 
             {leads.length === 0 ? (
                 <div className="bg-white rounded-3xl p-20 text-center shadow-[0_2px_20px_rgba(0,0,0,0.04)] mt-6">
-                    <p className="text-gray-400">暂无已完成的线索</p>
+                    <p className="text-gray-400">暂无已取消的线索</p>
                 </div>
             ) : (
                 <div className="space-y-4 mt-6">
@@ -37,7 +38,7 @@ export default async function DonePage() {
                                     lead={lead}
                                     nextStatus="processing"
                                     nextLabel="查看详情 →"
-                                    accentColor="border-l-4 border-orange-500"
+                                    accentColor="border-l-4 border-red-400"
                                 />
                             </Link>
                         </Reveal>

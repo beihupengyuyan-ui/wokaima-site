@@ -1,18 +1,12 @@
 import Link from "next/link";
 import EscapeBack from "@/components/EscapeBack";
+import { CONTACT_PHONE, CONTACT_PHONE_DISPLAY } from "@/lib/site-contact";
 
 /**
- * 全站统一电话。裸号码给 tel: 链接用，分组号码给人读（138 8078 8802，
- * 由裸号码派生，避免两处维护）。
+ * 全站统一电话在 lib/site-contact.ts —— 「我的申请」里「请联系客服 xxx」的文案也要用同一个号，
+ * 放一处免得改一半。
  * 顶部价格条移除后，页脚是唯一的电话落点。
  */
-const CONTACT_PHONE = "13880788802";
-
-const CONTACT_PHONE_DISPLAY = [
-    CONTACT_PHONE.slice(0, 3),
-    CONTACT_PHONE.slice(3, 7),
-    CONTACT_PHONE.slice(7),
-].join(" ");
 
 /**
  * 顶部导航只放「开店刚需」的四个决策入口，按客户的提问顺序排列：
@@ -126,6 +120,14 @@ export default function SiteLayout({
                             <li>
                                 <Link href="/apply" className="transition-colors hover:text-orange-400">
                                     免费出方案
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/apply/lookup"
+                                    className="transition-colors hover:text-orange-400"
+                                >
+                                    查询 / 取消申请
                                 </Link>
                             </li>
                         </ul>

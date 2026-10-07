@@ -1,4 +1,23 @@
-export default function StatusBadge({ status }: { status: string }) {
+import { isCancelled } from "@/lib/lead-status";
+
+export default function StatusBadge({
+    status,
+    subStatus,
+}: {
+    status: string;
+    /** 子状态；为「已放弃」时优先显示「已取消」，避免用户取消的单看起来仍待处理 */
+    subStatus?: string | null;
+}) {
+    // 已取消优先：小程序用户取消只改 sub_status，主状态仍是 pending
+    if (isCancelled({ sub_status: subStatus })) {
+        return (
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">
+        <span className="w-2 h-2 rounded-full bg-red-500" />
+        已取消
+      </span>
+        );
+    }
+
     const normalized =
         status === "pending" || status === "new"
             ? "pending"

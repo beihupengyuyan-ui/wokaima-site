@@ -1,26 +1,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import db from "@/lib/db";
 import LeadCard from "@/components/LeadCard";
 import LeadsTabs from "@/components/LeadsTabs";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import { leadCounts, listPendingLeads } from "@/lib/leads";
 
 export const dynamic = "force-dynamic";
-
-type Lead = {
-    id: number;
-    name: string;
-    phone: string;
-    company: string | null;
-    region: string | null;
-    product: string | null;
-    trade_in: number;
-    note: string | null;
-    ref: string | null;
-    status: string;
-    created_at: string;
-};
 
 export default async function PendingPage() {
     const cookieStore = await cookies();
@@ -30,13 +16,13 @@ export default async function PendingPage() {
         redirect("/admin");
     }
 
-    const leads = db
-        .prepare("SELECT * FROM leads WHERE status IN ('pending', 'new') ORDER BY created_at DESC")
-        .all() as Lead[];
+    // 已取消（sub_status=已放弃）的订单不在这里显示，统一收进 /admin/leads/cancelled
+    const leads = listPendingLeads();
+    const counts = leadCounts();
 
     return (
         <>
-            <LeadsTabs counts={{ pending: leads.length }}  />
+            <LeadsTabs counts={counts} />
 
             {leads.length === 0 ? (
                 <div className="bg-white rounded-3xl p-20 text-center shadow-[0_2px_20px_rgba(0,0,0,0.04)] mt-6">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import StatusBadge from "@/components/StatusBadge";
+import { isCancelled } from "@/lib/lead-status";
 
 type Lead = {
     id: number;
@@ -51,6 +52,7 @@ export default function LeadWorkspace({
     initialTags: string[];
 }) {
     const router = useRouter();
+    const cancelled = isCancelled(lead);
 
     const [status, setStatus] = useState(lead.status);
     const [subStatus, setSubStatus] = useState(lead.sub_status || "");
@@ -84,6 +86,21 @@ export default function LeadWorkspace({
 
     return (
         <div className="mt-8 space-y-6 animate-fade-in-up">
+            {/* 已取消提示：小程序取消只改 sub_status，主状态可能仍是「待处理」 */}
+            {cancelled && (
+                <div className="rounded-3xl bg-red-50 border border-red-100 p-6 text-sm text-red-600">
+                    <p className="font-semibold mb-1">该线索已取消（子状态：已放弃）</p>
+                    <p className="leading-relaxed">
+                        {!initialTags.includes("用户取消")
+                            ? "该线索已标记为放弃，请勿再按待处理跟进。"
+                            : lead.ref === "miniprogram"
+                              ? "用户已在小程序取消该订单，请勿再按待处理跟进。"
+                              : "用户已在官网「我的申请」自助取消，请勿再按待处理跟进。"}
+                        如需恢复，请在下方「主状态」改回待处理、并清空子状态后保存。
+                    </p>
+                </div>
+            )}
+
             {/* 客户信息卡 */}
             <div className="bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8">
                 {/* 顶部：姓名 + 时间 */}
@@ -95,7 +112,7 @@ export default function LeadWorkspace({
                         <div>
                             <div className="flex items-center gap-3 flex-wrap">
                                 <h1 className="text-2xl font-semibold text-gray-900">{lead.name}</h1>
-                                <StatusBadge status={lead.status} />
+                                <StatusBadge status={lead.status} subStatus={lead.sub_status} />
                             </div>
                             {lead.ref === "channel" && (
                                 <span className="inline-block mt-1 text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-600 font-medium">

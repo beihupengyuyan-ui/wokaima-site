@@ -179,8 +179,13 @@ export default function ApplyForm() {
                         感谢您的信任与支持
                     </p>
 
+                    {/* 反悔入口：提交后想撤单不必打电话 —— 凭手机号 + 姓名 / 公司名就能自助取消 */}
+                    <p className="mt-12 text-sm text-gray-400 leading-relaxed">
+                        填错信息或改变主意？可以在「我的申请」里凭手机号查询并取消。
+                    </p>
+
                     {/* 返回链接 */}
-                    <div className="mt-16 flex items-center justify-center gap-6 text-base text-gray-500">
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-base text-gray-500">
                         <Link
                             href="/"
                             className="hover:text-gray-900 transition-colors"
@@ -193,6 +198,13 @@ export default function ApplyForm() {
                             className="hover:text-gray-900 transition-colors"
                         >
                             查看产品
+                        </Link>
+                        <span className="w-px h-4 bg-gray-200" />
+                        <Link
+                            href="/apply/lookup"
+                            className="text-orange-600 hover:text-orange-700 transition-colors"
+                        >
+                            查询 / 取消申请
                         </Link>
                     </div>
                 </div>

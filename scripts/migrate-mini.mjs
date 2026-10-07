@@ -43,6 +43,15 @@ add("lease_term", "lease_term TEXT");
 add("address", "address TEXT"); // 详细地址（region 存省市区+详细完整串）
 add("updated_at", "updated_at TEXT");
 
+// 后台工作台（/admin/leads/[id] 与 /api/admin/leads/[id]/update）依赖的三列。
+// 它们比小程序对接更早存在，当初只在本机手工 ALTER 过、从没写进任何脚本，
+// 于是线上库缺这三列时：admin 列表/详情只是读到 undefined（看起来正常），
+// 但 POST /api/mini/orders 的 INSERT 显式写了这三列 → SQLite 抛
+// "table leads has no column named sub_status" → 接口 500、订单永远进不来。
+add("sub_status", "sub_status TEXT"); // 细粒度进度：已联系 / 已报价 / 已签约 / 已放弃…
+add("follow_ups", "follow_ups TEXT"); // 跟进记录 JSON [{time,text}]
+add("tags", "tags TEXT"); // 标签 JSON
+
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_openid ON leads(openid)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_order_no ON leads(order_no)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source, status)");

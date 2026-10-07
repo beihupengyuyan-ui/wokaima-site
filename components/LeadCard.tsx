@@ -1,4 +1,5 @@
 import StatusBadge from "@/components/StatusBadge";
+import { isCancelled, isFromMiniProgram } from "@/lib/lead-status";
 
 type Lead = {
     id: number;
@@ -11,6 +12,7 @@ type Lead = {
     note: string | null;
     ref: string | null;
     status: string;
+    sub_status: string | null;
     created_at: string;
 };
 
@@ -37,14 +39,23 @@ export default function LeadCard({
     nextLabel: string | null;
     accentColor: string;
 }) {
+    const cancelled = isCancelled(lead);
+    const fromMini = isFromMiniProgram(lead);
+
     return (
         <div
-            className={`bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-6 transition-all duration-500 ease-out hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1 animate-fade-in-up border-l-4 ${
-                lead.status === "pending" || lead.status === "new"
-                    ? "border-orange-500"
-                    : lead.status === "processing" || lead.status === "contacted"
-                        ? "border-blue-500"
-                        : "border-green-500"
+            className={`bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-6 transition-all duration-500 ease-out animate-fade-in-up border-l-4 ${
+                cancelled
+                    ? "border-red-400 bg-gray-50/70 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+                    : "hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1"
+            } ${
+                cancelled
+                    ? ""
+                    : lead.status === "pending" || lead.status === "new"
+                        ? "border-orange-500"
+                        : lead.status === "processing" || lead.status === "contacted"
+                            ? "border-blue-500"
+                            : "border-green-500"
             }`}
         >
             {/* 顶部：姓名 + 时间 */}
@@ -56,10 +67,15 @@ export default function LeadCard({
                     <div>
                         <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="font-semibold text-lg text-gray-900">{lead.name}</h3>
-                            <StatusBadge status={lead.status} />
+                            <StatusBadge status={lead.status} subStatus={lead.sub_status} />
                             {lead.ref === "channel" && (
                                 <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 font-medium">
       渠道
+    </span>
+                            )}
+                            {fromMini && (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 font-medium">
+      小程序
     </span>
                             )}
                         </div>
@@ -72,6 +88,19 @@ export default function LeadCard({
 
             {/* 信息区 */}
             <div className="mt-4 space-y-3">
+                {/* 已取消提示：避免已取消的订单看起来像全新的待处理线索 */}
+                {cancelled && (
+                    <div className="flex items-start gap-2 text-sm rounded-2xl bg-red-50 px-4 py-3 text-red-600">
+                        <span className="flex-shrink-0">⛔</span>
+                        <span>
+                            {fromMini
+                                ? "用户已在小程序取消该订单，无需再跟进"
+                                : "该线索已标记为放弃，无需再跟进"}
+                            ；如需恢复，进入详情页把主状态改回「待处理」并清空子状态后保存。
+                        </span>
+                    </div>
+                )}
+
                 {/* 电话 + 公司（同一行） */}
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                     <div className="flex items-center gap-2 text-sm">

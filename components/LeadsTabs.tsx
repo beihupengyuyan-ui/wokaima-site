@@ -6,7 +6,12 @@ import { usePathname } from "next/navigation";
 export default function LeadsTabs({
                                       counts,
                                   }: {
-    counts: { pending?: number; processing?: number; done?: number };
+    counts: {
+        pending?: number;
+        processing?: number;
+        done?: number;
+        cancelled?: number;
+    };
 }) {
     const pathname = usePathname();
 
@@ -31,6 +36,13 @@ export default function LeadsTabs({
             href: "/admin/leads/done",
             count: counts.done,
             activeColor: "bg-green-600 shadow-green-600/20",
+        },
+        {
+            key: "cancelled",
+            label: "已取消",
+            href: "/admin/leads/cancelled",
+            count: counts.cancelled,
+            activeColor: "bg-red-500 shadow-red-500/20",
         },
     ];
 
