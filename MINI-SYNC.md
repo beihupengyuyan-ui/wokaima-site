@@ -97,18 +97,36 @@ amount_monthly / lease_term / address / updated_at` + **`sub_status / follow_ups
 
 ## 3. 发布代码
 
+**推荐：本地一条命令，推送即上线**
+
 ```bash
-cd /home/ubuntu/wokaima-site
-git pull            # 或本地 git push 后服务器再 pull
-npm install         # 本次没加依赖，可跳过
-npm run build
-pm2 restart wokaima
+# 在你 Windows 本地的仓库里
+git add -A
+git commit -m "说明"
+git push server main     # 直推服务器裸库 → 服务器钩子自动部署
 ```
 
-> 更省事：仓库里已带一键脚本 `scripts/deploy.sh`，在服务器上执行 `bash scripts/deploy.sh`
-> 即可完成上面全部步骤（额外含数据库备份、迁移与部署后自检）；`package.json` 有改动时用
-> `bash scripts/deploy.sh --install`。脚本发现服务器有未提交改动会直接拒绝执行，
-> 避免「git pull 失败了、但仍在用旧代码构建」这种最隐蔽的线上不更新。
+推送那一刻，服务器自动依次做：**备份数据库 → 补缺失字段 → 构建 → 构建成功才重启 pm2 → 自检**，
+全过程日志实时回显在你本地的 push 终端（服务器侧存档 `/home/ubuntu/oldsite-deploy.log`）。
+构建失败时不会重启，线上仍是上一个可用版本，不会半截上线。
+
+**手动：排查问题时用**
+
+```bash
+cd /home/ubuntu/wokaima-site
+bash scripts/deploy.sh              # 常规发布
+bash scripts/deploy.sh --install    # package.json 有改动时（先装依赖再构建）
+```
+
+> **为什么不是「服务器 git pull」了？**
+> 这台服务器**连不通 GitHub（实测 http=000）**，所以服务器不再从 GitHub 拉代码，而是从服务器上的裸库拉。
+> 服务器上的 remote 已调整：`origin` = `/home/ubuntu/git/wokaima-site.git`（本地路径、秒拉），
+> `github` = GitHub（仅作云端存档，需要从本地推）。本地仓库对应新增 `server` remote。
+> 自动部署钩子位于裸库 `hooks/post-receive`；把它里面的 `AUTO_DEPLOY` 改成 `0`，就退化成「只更新代码、不自动构建重启」。
+>
+> **`deploy.sh` 的「工作区检查」只看已跟踪文件**（`git status --porcelain --untracked-files=no`）：
+> 本目录里长期存在 `data/wokaima.db*` 备份、`next` 之类未跟踪文件，若把它们也算作「脏」，
+> 脚本会永远拒绝部署 —— 这正是「推了代码、线上死活不变」的另一半原因。
 
 ## 4. 部署后自测（照着敲，看到什么就是什么）
 
