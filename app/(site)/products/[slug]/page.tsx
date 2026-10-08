@@ -41,7 +41,7 @@ export default async function ProductDetail({
                         <div className="mt-6">
                             <div className="flex items-baseline gap-3">
                                 <span className="text-5xl font-bold text-orange-600 md:text-6xl">
-                                    ¥{product.dailyRent}
+                                    {product.dailyRent}
                                 </span>
                                 <span className="text-lg text-gray-500">{product.dailyRentUnit}</span>
                             </div>

@@ -325,7 +325,7 @@ export default function Home() {
 
                                         <div className="mt-7 flex items-baseline gap-2">
                                             <span className="text-4xl font-bold text-orange-600 md:text-5xl">
-                                                ¥{p.dailyRent}
+                                                {p.dailyRent}
                                             </span>
                                             <span className="text-sm text-gray-500">{p.dailyRentUnit}</span>
                                         </div>
