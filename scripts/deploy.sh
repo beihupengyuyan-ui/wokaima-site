@@ -6,6 +6,15 @@
 #   bash scripts/deploy.sh                 # 常规发布
 #   bash scripts/deploy.sh --install       # package.json 改过时，先装依赖再构建
 #
+# 由谁触发：
+#   ① 自动：本地 `git push server main` → 裸库钩子 post-receive 自动调用本脚本（推荐）
+#   ② 手动：登录服务器执行上面两行
+#
+# 关于第 2 步的 origin：
+#   本机 origin 已指向服务器裸库 /home/ubuntu/git/wokaima-site.git（本地路径，秒拉），
+#   因为这台服务器连不通 GitHub（实测 http=000）；GitHub 保留为 `github` remote。
+#   查看：git remote -v
+#
 # 依次做 7 件事：看版本 → 检查工作区 → 拉代码 → (可选)装依赖 → 备份并迁移数据库 → 构建 → 重启 pm2 → 自检。
 # 任何一步失败都会立刻停下，绝不会带着半截状态去重启进程。
 set -euo pipefail
@@ -29,8 +38,10 @@ git log -1 --oneline
 
 echo
 echo "== 1. 检查服务器工作区 =="
-if [ -n "$(git status --porcelain)" ]; then
-    echo "✗ 服务器上有未提交的改动，git pull 会被拒绝。"
+# 只看「已跟踪文件」的改动：未跟踪的 data/ 数据库与历史备份、以及历史遗留文件都不影响发布，
+# 若把它们也算进来，本目录会永远被判为「脏」，脚本反而永远不肯部署。
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+    echo "✗ 服务器上有未提交的改动（已跟踪文件），git pull 会被拒绝。"
     echo "  这正是「本地推了代码、线上一直不变」最常见的原因：拉取失败，构建用的还是旧代码。"
     echo
     git status --short
