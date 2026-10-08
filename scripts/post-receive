@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# 沃凯玛官网（wokaima-site）· 服务器裸库钩子模板
+#
+# 安装位置：/home/ubuntu/git/wokaima-site.git/hooks/post-receive
+# 安装方法（在服务器上，一次性；每次改完本文件后重复一遍）：
+#   cp /home/ubuntu/wokaima-site/scripts/post-receive /home/ubuntu/git/wokaima-site.git/hooks/post-receive
+#   chmod +x /home/ubuntu/git/wokaima-site.git/hooks/post-receive
+#
+# 触发链路：本地 git push server main → 本钩子 → 在部署目录执行 scripts/deploy.sh
+#          （deploy.sh 自带：备份数据库 → 补字段 → 构建 → 构建成功才重启 → 自检）
+# 说明见 MINI-SYNC.md 第 3 节。
+AUTO_DEPLOY=1                 # 改成 0：只更新代码，不自动构建重启
+APP_DIR="${APP_DIR:-/home/ubuntu/wokaima-site}"
+BRANCH="${BRANCH:-main}"
+LOG="${LOG:-/home/ubuntu/oldsite-deploy.log}"
+
+# 日志同时写文件 + 实时回传给 push 客户端
+exec > >(tee -a "$LOG") 2>&1
+echo "---- 收到 push：$(date '+%F %T') ----"
+
+# 钩子里 git 会设置 GIT_DIR，不 unset 的话 cd 到部署目录后仍会操作裸库
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+export PM2_HOME="${PM2_HOME:-/home/ubuntu/.pm2}"
+
+PUSHED=0
+while read -r _old _new ref; do
+    [ -n "${ref:-}" ] || continue
+    echo "  更新：$ref"
+    case "$ref" in
+        "refs/heads/$BRANCH") PUSHED=1 ;;
+    esac
+done
+[ "$PUSHED" = "1" ] || { echo "本次没有更新 $BRANCH，跳过部署。"; exit 0; }
+
+cd "$APP_DIR" || { echo "✗ 部署目录不存在：$APP_DIR"; exit 1; }
+
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+    echo "✗ 部署目录有未提交改动（已跟踪文件），已跳过自动部署（代码已在裸库，不会丢）。"
+    echo "  处理： git -C $APP_DIR stash push -m 'server edits'"
+    echo "  处理完再手动执行： cd $APP_DIR && bash scripts/deploy.sh"
+    exit 1
+fi
+
+if [ "$AUTO_DEPLOY" = "1" ]; then
+    echo "触发发布（构建失败不会重启，线上仍是旧版本）..."
+    bash scripts/deploy.sh
+    code=$?
+    echo "---- 部署脚本退出码：$code ----"
+    [ "$code" -eq 0 ] || echo "✗ 发布未成功，线上仍是上一个成功版本。日志：$LOG"
+else
+    echo "AUTO_DEPLOY=0，仅更新代码。上线请执行： cd $APP_DIR && bash scripts/deploy.sh"
+fi
+exit 0
