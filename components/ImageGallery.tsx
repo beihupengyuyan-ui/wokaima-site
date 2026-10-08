@@ -30,7 +30,7 @@ export default function ImageGallery({
                     <button
                         key={img}
                         onClick={() => setOpenIndex(i)}
-                        className={`group overflow-hidden animate-fade-in-up cursor-zoom-in transition-all duration-300 ${
+                        className={`group overflow-hidden animate-fade-in-up cursor-zoom-in transition duration-200 ${
                             fullWidth
                                 ? "w-full rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.08)]"
                                 : isSingle

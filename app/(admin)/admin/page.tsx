@@ -19,7 +19,7 @@ export default function AdminLogin() {
         });
 
         if (res.ok) {
-            window.location.href = "/admin/leads";
+            window.location.href = "/admin/overview";
         } else {
             setError("密码错误");
         }
@@ -44,7 +44,7 @@ export default function AdminLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="管理密码"
-                    className="mt-8 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200"
+                    className="mt-8 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150"
                     required
                 />
 
@@ -53,7 +53,7 @@ export default function AdminLogin() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="mt-6 w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold hover:bg-orange-700 transition-all duration-200 disabled:opacity-50"
+                    className="mt-6 w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold transition-colors duration-150 hover:bg-orange-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "登录中..." : "登录"}
                 </button>

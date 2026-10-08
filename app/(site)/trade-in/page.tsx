@@ -71,7 +71,7 @@ export default function TradeInPage() {
                 >
                     <Link
                         href="/apply?tradeIn=yes"
-                        className="inline-block rounded-2xl bg-orange-600 px-10 py-4 text-white font-semibold text-lg hover:bg-orange-700 hover:shadow-xl hover:shadow-orange-600/30 active:scale-[0.97] transition-all duration-200"
+                        className="inline-block rounded-2xl bg-orange-600 px-10 py-4 text-white font-semibold text-lg hover:bg-orange-700 hover:shadow-xl hover:shadow-orange-600/30 active:scale-[0.97] transition duration-150"
                     >
                         申请以旧换新
                     </Link>

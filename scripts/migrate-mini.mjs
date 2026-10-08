@@ -52,10 +52,22 @@ add("sub_status", "sub_status TEXT"); // 细粒度进度：已联系 / 已报价
 add("follow_ups", "follow_ups TEXT"); // 跟进记录 JSON [{time,text}]
 add("tags", "tags TEXT"); // 标签 JSON
 
+// 「客户取消订单」模块（/admin/cancellations）：取消来源 + 原因 + 后台处理闭环。
+// 老数据这三类一律为 NULL，页面按「来源未知 / 未填写原因 / 未处理」展示，不做猜测性回填。
+add("cancel_source", "cancel_source TEXT"); // 官网 | 小程序 | 后台
+add("cancel_reason", "cancel_reason TEXT"); // 客户取消时选填（白名单 7 档，见 lib/lead-status.ts）
+add("cancel_note", "cancel_note TEXT"); // 选「其他原因」时客户补的自由文本：后台卡片上显示原话
+add("cancel_at", "cancel_at TEXT"); // 取消时间（UTC）；老数据用 updated_at 兜底展示
+add("handle_status", "handle_status TEXT"); // pending 未处理 | handled 已处理（NULL 视为未处理）
+add("handle_result", "handle_result TEXT"); // 已回访挽回 / 客户确认取消 / 已退款 / 联系不上 / 后台标记放弃
+add("handled_at", "handled_at TEXT"); // 处理时间（UTC）
+
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_openid ON leads(openid)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_order_no ON leads(order_no)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source, status)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_client_order_no ON leads(client_order_no)");
+// 「客户取消订单」列表：按 sub_status + handle_status 过滤（待处理 / 已处理）
+db.exec("CREATE INDEX IF NOT EXISTS idx_leads_cancel_handle ON leads(sub_status, handle_status)");
 
 console.log("\n✓ 迁移完成，当前 leads 字段：");
 console.log("  " + db.prepare("PRAGMA table_info(leads)").all().map((c) => c.name).join(", "));

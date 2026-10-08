@@ -44,12 +44,27 @@ body {
     color: var(--foreground);
 }
 
-input,
-select,
-textarea,
-button,
-a {
-    transition: all 0.2s ease-out;
+/* 交互元素只过渡「真的会变的那几个属性」。
+   ＊ 原来写的是 transition: all 0.2s，三个副作用：
+     1) 文字色和底色是两条 200ms 曲线，点「取消理由」气泡时中途会出现
+        「浅红底 + 浅灰字」，截图/眨眼一看就是一片糊；
+     2) all 把 border-radius、box-shadow、backdrop-filter 也拉进来，
+        每个按钮都被丢进独立合成层，长列表更容易掉帧；
+     3) 这条规则以前写在 @layer 之外 —— 无层级样式优先于所有 @layer 里的规则，
+        于是组件里写的 transition-colors / duration-150 全被压死，
+        动效时长全站各写各的，也就出现「有的地方动画跟不上」。
+   现在放进 base 层：utilities 层的类名能正常覆盖它，默认则是下面这套 150ms。
+   时长从 200ms 收到 150ms：按钮反馈超过 200ms 就会让人觉得「没反应」。 */
+@layer base {
+    input,
+    select,
+    textarea,
+    button,
+    a {
+        transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+        transition-duration: 150ms;
+        transition-timing-function: ease-out;
+    }
 }
 
 /* ========== 动画 ========== */
@@ -80,6 +95,42 @@ a {
 
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out both;
+}
+
+/* 局部更新：确认取消区展开、列表里某一张卡片换状态时用它。
+   以前这类内容是「啪」地出现 —— 外层容器跑 600ms 入场，局部一秒钟内跳变，
+   两个节奏撞在一起就显得动画没跟上。0.18s 配上面 150ms 的按钮反馈刚好同拍。 */
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-pop-in {
+    animation: popIn 0.18s ease-out both;
+}
+
+/* 用户要求减少动效（系统设置）时，入场动画与过渡一律「直接到位」 */
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fade-in-up,
+    .animate-pop-in {
+        animation-duration: 0.01ms;
+        animation-iteration-count: 1;
+    }
+
+    input,
+    select,
+    textarea,
+    button,
+    a {
+        transition-duration: 0.01ms;
+    }
 }
 
 /* ========== 几何装饰 ========== */

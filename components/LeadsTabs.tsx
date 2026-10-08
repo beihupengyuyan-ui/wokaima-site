@@ -10,11 +10,12 @@ export default function LeadsTabs({
         pending?: number;
         processing?: number;
         done?: number;
-        cancelled?: number;
     };
 }) {
     const pathname = usePathname();
 
+    // 只有三个页签：客户取消的申请已抽成独立模块（/admin/cancellations），
+    // 不再混在线索里当第四个页签，免得「取消」被当成一种进度状态。
     const tabs = [
         {
             key: "pending",
@@ -37,13 +38,6 @@ export default function LeadsTabs({
             count: counts.done,
             activeColor: "bg-green-600 shadow-green-600/20",
         },
-        {
-            key: "cancelled",
-            label: "已取消",
-            href: "/admin/leads/cancelled",
-            count: counts.cancelled,
-            activeColor: "bg-red-500 shadow-red-500/20",
-        },
     ];
 
     return (
@@ -54,10 +48,10 @@ export default function LeadsTabs({
                     <Link
                         key={tab.key}
                         href={tab.href}
-                        className={`relative px-5 py-2 rounded-xl text-sm font-medium transition-all duration-300 ease-out ${
+                        className={`relative px-5 py-2 rounded-xl text-sm font-medium transition-colors duration-150 ease-out ${
                             isActive
-                                ? `${tab.activeColor} text-white shadow-lg scale-[1.02]`
-                                : "text-gray-600 hover:bg-gray-50 hover:scale-[1.02]"
+                                ? `${tab.activeColor} text-white shadow-lg`
+                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         }`}
                     >
             <span className="flex items-center gap-2">

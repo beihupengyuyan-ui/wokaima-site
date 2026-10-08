@@ -20,7 +20,7 @@ export default function ProductsPage() {
                         <Link
                             key={p.slug}
                             href={`/products/${p.slug}`}
-                            className="group bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] overflow-hidden transition-all duration-300 hover:shadow-[0_12px_48px_rgba(0,0,0,0.1)] hover:-translate-y-1 animate-fade-in-up"
+                            className="group bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] overflow-hidden transition duration-200 hover:shadow-[0_12px_48px_rgba(0,0,0,0.1)] hover:-translate-y-1 animate-fade-in-up"
                             style={{ animationDelay: `${0.1 + i * 0.08}s` }}
                         >
                             {/* 产品图区域：固定大尺寸，撑满卡片宽度 */}

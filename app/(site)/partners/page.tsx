@@ -45,7 +45,7 @@ export default function PartnersPage() {
                 {/* 渠道商申请表单 */}
                 <form
                     action={submitPartner}
-                    className="bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 md:p-10 space-y-6 transition-all duration-300 animate-fade-in-up"
+                    className="bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-8 md:p-10 space-y-6 transition duration-200 animate-fade-in-up"
                     style={{ animationDelay: "0.2s" }}
                 >
                     <div className="grid md:grid-cols-2 gap-5">
@@ -57,7 +57,7 @@ export default function PartnersPage() {
                                 name="name"
                                 required
                                 placeholder="请输入姓名"
-                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200"
+                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150"
                             />
                         </div>
                         <div>
@@ -68,7 +68,7 @@ export default function PartnersPage() {
                                 name="phone"
                                 required
                                 placeholder="请输入手机号"
-                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200"
+                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150"
                             />
                         </div>
                     </div>
@@ -81,7 +81,7 @@ export default function PartnersPage() {
                             <input
                                 name="region"
                                 placeholder="例如：四川成都"
-                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200"
+                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150"
                             />
                         </div>
                         <div>
@@ -90,7 +90,7 @@ export default function PartnersPage() {
                             </label>
                             <select
                                 name="channelType"
-                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200 appearance-none"
+                                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150 appearance-none"
                             >
                                 <option value="">请选择</option>
                                 <option value="dealer">厨具经销商</option>
@@ -107,7 +107,7 @@ export default function PartnersPage() {
                         </label>
                         <select
                             name="volume"
-                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200 appearance-none"
+                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150 appearance-none"
                         >
                             <option value="">请选择</option>
                             <option value="1-3">1-3 台</option>
@@ -124,13 +124,13 @@ export default function PartnersPage() {
                             name="note"
                             rows={4}
                             placeholder="您目前的客户群体、合作意向等"
-                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200 resize-none"
+                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150 resize-none"
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold text-lg hover:bg-orange-700 hover:shadow-xl hover:shadow-orange-600/30 active:scale-[0.97] transition-all duration-200 ease-out shadow-lg shadow-orange-600/20"
+                        className="w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold text-lg hover:bg-orange-700 hover:shadow-xl hover:shadow-orange-600/30 active:scale-[0.97] transition duration-150 ease-out shadow-lg shadow-orange-600/20"
                     >
                         申请成为渠道商
                     </button>

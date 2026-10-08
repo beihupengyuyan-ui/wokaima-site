@@ -88,14 +88,14 @@ export default function Home() {
                     <div className="mt-14 md:mt-16 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
                         <Link
                             href="/apply"
-                            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 px-9 py-4 text-lg font-semibold text-white shadow-xl shadow-orange-600/30 hover:shadow-2xl hover:shadow-orange-600/40 active:scale-[0.97] transition-all duration-300"
+                            className="group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-500 px-9 py-4 text-lg font-semibold text-white shadow-xl shadow-orange-600/30 hover:shadow-2xl hover:shadow-orange-600/40 active:scale-[0.97] transition duration-150"
                         >
                             免费领取出租方案
                             <span className="transition-transform group-hover:translate-x-1">→</span>
                         </Link>
                         <Link
                             href="#rent"
-                            className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white/70 px-9 py-4 text-lg font-semibold text-gray-900 hover:border-orange-300 hover:text-orange-600 transition-all duration-300"
+                            className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white/70 px-9 py-4 text-lg font-semibold text-gray-900 transition-colors duration-150 hover:border-orange-300 hover:text-orange-600"
                         >
                             查看租金价目
                         </Link>
@@ -265,7 +265,7 @@ export default function Home() {
                         <div className="mt-20 md:mt-24">
                             <Link
                                 href="/apply"
-                                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-9 py-4 text-lg font-semibold text-white transition-all hover:bg-white/10"
+                                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-9 py-4 text-lg font-semibold text-white transition-colors duration-150 hover:bg-white/10"
                             >
                                 算一算我能省多少 →
                             </Link>
@@ -353,7 +353,7 @@ export default function Home() {
                             </p>
                             <Link
                                 href="/products"
-                                className="mt-8 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-9 py-4 text-lg font-semibold text-gray-900 transition-all hover:border-orange-300 hover:text-orange-600"
+                                className="mt-8 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-9 py-4 text-lg font-semibold text-gray-900 transition-colors duration-150 hover:border-orange-300 hover:text-orange-600"
                             >
                                 查看完整参数与计价方式 →
                             </Link>
@@ -449,7 +449,7 @@ export default function Home() {
                         {highlights.map((item, i) => (
                             <Reveal key={item.title} delay={0.08 * i}>
                                 <Link href={item.href} className="group block h-full">
-                                    <div className="flex h-56 items-center justify-center rounded-[2rem] bg-gradient-to-br from-orange-50 to-white text-7xl transition-all duration-500 group-hover:scale-[1.03] group-hover:shadow-[0_30px_80px_rgba(249,115,22,0.18)] md:h-64">
+                                    <div className="flex h-56 items-center justify-center rounded-[2rem] bg-gradient-to-br from-orange-50 to-white text-7xl transition duration-200 group-hover:scale-[1.03] group-hover:shadow-[0_30px_80px_rgba(249,115,22,0.18)] md:h-64">
                                         {item.icon}
                                     </div>
                                     <h3 className="mt-10 text-2xl font-bold text-gray-900 transition-colors group-hover:text-orange-600">
@@ -542,14 +542,14 @@ export default function Home() {
                         <div className="mt-14 flex flex-col justify-center gap-4 md:mt-16 sm:flex-row">
                             <Link
                                 href="/apply"
-                                className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-10 py-4 text-lg font-semibold text-orange-600 shadow-xl transition-all hover:bg-orange-50 active:scale-[0.97]"
+                                className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-10 py-4 text-lg font-semibold text-orange-600 shadow-xl transition duration-150 hover:bg-orange-50 active:scale-[0.97]"
                             >
                                 免费领取出租方案
                                 <span className="transition-transform group-hover:translate-x-1">→</span>
                             </Link>
                             <Link
                                 href="/products"
-                                className="inline-flex items-center justify-center rounded-full border border-white/60 px-10 py-4 text-lg font-semibold text-white transition-all hover:bg-white/10"
+                                className="inline-flex items-center justify-center rounded-full border border-white/60 px-10 py-4 text-lg font-semibold text-white transition-colors duration-150 hover:bg-white/10"
                             >
                                 查看租金价目
                             </Link>

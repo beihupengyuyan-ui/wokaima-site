@@ -44,7 +44,7 @@ export default function LeadCard({
 
     return (
         <div
-            className={`bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-6 transition-all duration-500 ease-out animate-fade-in-up border-l-4 ${
+            className={`bg-white rounded-3xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-6 transition duration-200 ease-out animate-fade-in-up border-l-4 ${
                 cancelled
                     ? "border-red-400 bg-gray-50/70 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
                     : "hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1"

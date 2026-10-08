@@ -1,8 +1,9 @@
 /**
  * POST /api/site/orders/cancel —— 官网「我的申请」自助取消
  *
- * 入参 JSON：{ id, phone, keyword }（id 来自查询结果；phone / keyword 再核验一次，
- * 避免拿到别人的 id 直接取消）。
+ * 入参 JSON：{ id, phone, keyword, reason?, reasonNote? }（id 来自查询结果；phone / keyword 再核验一次，
+ * 避免拿到别人的 id 直接取消；reason 是客户选填的取消原因，落库给后台做原因分布统计；
+ * reasonNote 是选了「其他原因」之后补的那句话，落 cancel_note —— 统计按 reason，原话留在后台卡片上）。
  * 出参统一 200：
  *   { ok: true, order }                                  ← 已取消，返回更新后的申请
  *   { ok: false, reason, message }                        ← not_found / already_cancelled / not_pending
@@ -14,7 +15,13 @@ import { cancelSiteOrder } from "@/lib/site-orders";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-    let body: { id?: unknown; phone?: unknown; keyword?: unknown };
+    let body: {
+        id?: unknown;
+        phone?: unknown;
+        keyword?: unknown;
+        reason?: unknown;
+        reasonNote?: unknown;
+    };
     try {
         body = await request.json();
     } catch {
@@ -36,6 +43,8 @@ export async function POST(request: Request) {
         id,
         phone: String(body.phone ?? ""),
         keyword: String(body.keyword ?? ""),
+        reason: body.reason,
+        reasonNote: body.reasonNote,
     });
 
     return NextResponse.json(result);

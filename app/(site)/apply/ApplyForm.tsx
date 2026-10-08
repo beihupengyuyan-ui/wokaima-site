@@ -84,14 +84,14 @@ export default function ApplyForm() {
     };
 
     const inputClass = (key: string) =>
-        `w-full rounded-2xl border bg-gray-50 px-5 py-4 text-lg text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-4 transition-all duration-200 ${
+        `w-full rounded-2xl border bg-gray-50 px-5 py-4 text-lg text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-4 transition duration-150 ${
             errors.includes(key)
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100/60"
                 : "border-gray-200 focus:border-orange-500 focus:ring-orange-100/60"
         }`;
 
     const selectClass = (key: string) =>
-        `w-full rounded-2xl border bg-gray-50 px-3 py-4 text-base text-gray-900 focus:bg-white focus:outline-none focus:ring-4 transition-all duration-200 ${
+        `w-full rounded-2xl border bg-gray-50 px-3 py-4 text-base text-gray-900 focus:bg-white focus:outline-none focus:ring-4 transition duration-150 ${
             errors.includes(key)
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100/60"
                 : "border-gray-200 focus:border-orange-500 focus:ring-orange-100/60"
@@ -399,7 +399,7 @@ export default function ApplyForm() {
                             name="note"
                             rows={4}
                             placeholder="店面情况、想租的设备、旧设备型号（如需以旧换新）等"
-                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 text-lg text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/60 transition-all duration-200 resize-none"
+                            className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4 text-lg text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/60 transition duration-150 resize-none"
                         />
                     </div>
 
@@ -413,7 +413,7 @@ export default function ApplyForm() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="group w-full rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 py-5 text-white font-bold text-xl hover:shadow-2xl hover:shadow-orange-600/40 active:scale-[0.98] transition-all duration-300 ease-out shadow-xl shadow-orange-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="group w-full rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 py-5 text-white font-bold text-xl hover:shadow-2xl hover:shadow-orange-600/40 active:scale-[0.98] transition duration-150 ease-out shadow-xl shadow-orange-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading ? "提交中..." : "立即提交申请"}
                         {!loading && <span className="transition-transform group-hover:translate-x-1">→</span>}

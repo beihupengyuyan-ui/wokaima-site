@@ -1,13 +1,14 @@
 # 小程序 ↔ 官网后台 数据打通 · 部署手册
 
 > 本文档对应代码：`lib/mini.ts`、`app/api/mini/**`、`scripts/migrate-mini.mjs`
-> 小程序端对应文件：`utils/config.js`、`utils/api.js`、`utils/auth.js`、`utils/orders.js`、`data/products.js`
+> 小程序端对应文件：`utils/config.js`、`utils/api.js`、`utils/auth.js`、`utils/orders.js`、`utils/order-status.js`（状态与取消原因口径）、`data/products.js`
 
 ## 0. 一句话架构
 
 小程序不碰数据库，只调 6 个 `/api/mini/*` 接口；订单**直接写进现有 `leads` 表**，
-后台 `/admin/leads/pending|processing|done|cancelled`、`/admin/leads/[id]` 直接复用现有页面，
-工程师在后台点「已联系 / 已报价 / 已签约」，小程序订单详情立刻同步。
+后台 `/admin/leads/pending|processing|done`、`/admin/leads/[id]` 直接复用现有页面，
+工程师在后台点「已联系 / 已报价 / 已签约」，小程序订单详情立刻同步；
+客户取消的订单不在线索三页签里，统一进 `/admin/cancellations`（见 0.1 节）。
 
 | admin 后台 sub_status | 小程序显示 |
 | --- | --- |
@@ -17,13 +18,30 @@
 | `sub_status = 已放弃` | 已取消 |
 
 > 取消**不写** `status='cancelled'`（写了会从后台主状态维度里丢失原始状态），
-> 小程序取消 = `sub_status='已放弃'` + tags 追加「用户取消」。
+> 取消 = `sub_status='已放弃'` + tags 追加「用户取消」+ `cancel_source / cancel_reason / cancel_at`。
 >
-> ⚠️ **后台四个列表页必须同时看 `status` 和 `sub_status`**（统一走 `lib/leads.ts`）：
+> ⚠️ **后台三个线索列表页必须同时看 `status` 和 `sub_status`**（统一走 `lib/leads.ts`）：
 > `sub_status='已放弃'` 的线索一律从「待处理 / 处理中 / 已完成」中排除，只出现在
-> **`/admin/leads/cancelled`（已取消页签）**，卡片与详情页都显示红色「已取消」徽标与「无需再跟进」提示。
+> **`/admin/cancellations`（客户取消订单模块）**，卡片与详情页都显示红色「已取消」徽标与「无需再跟进」提示。
 > 早期版本只按 `status IN ('pending','new')` 查询，导致用户已取消的订单在后台看起来还是崭新的待处理线索。
 > SQL 片段（`NOT_CANCELLED_SQL` / `CANCELLED_SQL`）与判定函数都在 `lib/lead-status.ts`，新增列表查询请复用，不要各页自己拼 WHERE。
+
+## 0.1 客户取消订单（后台闭环 + 原因统计）
+
+`/admin/cancellations` 是独立模块（导航第二项，带未处理红点），把「客户取消了」当成一件待办：
+
+- **待处理 / 已处理 / 全部** 三个视图，另有取消原因分布条形图与近 7 天取消数（`cancelStats()`）；
+- 一张单的完整链路：客户在**官网**（`/apply/lookup` → `POST /api/site/orders/cancel`）或
+  **小程序**（`POST /api/mini/orders/[orderNo]/cancel`，可选 `{ reason }`）自助取消
+  → 写 `sub_status='已放弃'` + `cancel_source` / `cancel_reason` / `cancel_at`（`handle_status` 留空 = 未处理）
+  → 后台在卡片上选处理结果（`已回访挽回 / 客户确认取消 / 已退款 / 联系不上 / 后台标记放弃`）
+  → `POST /api/admin/leads/[id]/cancel` 写 `handle_status='handled'` + `handle_result` + `handled_at`
+  → 追加标签「取消已处理」与一条 `follow_ups`；选「已回访挽回」时订单主状态改回 `pending`、
+  `sub_status` 清空（**复活**，重新出现在待处理列表，取消原因与时间保留）。
+- 后台工程师自己在工作台把单标成「已放弃」= 后台发起的取消，`POST /api/admin/leads/[id]/update`
+  自动补 `cancel_source='后台'` 并直接记成「已处理 · 后台标记放弃」，不会污染待处理红点。
+- 老数据（本次改造前取消的单）这 6 列是 NULL，页面按「来源未知 / 未填写原因 / 未处理」展示，
+  不做猜测性回填；`cancel_at` 缺省时用 `updated_at / created_at` 排序与展示。
 
 ## 1. 服务器环境变量
 
@@ -55,7 +73,13 @@ node scripts/migrate-mini.mjs
 ```
 
 新增列：`source / openid / order_no / client_order_no / items_json / amount_daily /
-amount_monthly / lease_term / address / updated_at` + **`sub_status / follow_ups / tags`** + 4 个索引。
+amount_monthly / lease_term / address / updated_at` + **`sub_status / follow_ups / tags`** +
+**`cancel_source / cancel_reason / cancel_note / cancel_at / handle_status / handle_result / handled_at`** + 5 个索引。
+
+> 最后那 7 列是「客户取消订单」模块（0.1 节）用的：老数据一律为 NULL，
+> 列表按「来源未知 / 未填写原因 / 未处理」展示。**缺列时的症状**：后台 `/admin/cancellations`
+> 与详情页的取消卡片读不到字段（显示未处理 / 未填写原因），
+> 且 `POST /api/admin/leads/[id]/cancel` 会 500 —— 补跑一次本脚本即可。
 
 > ⚠️ 最后三列（`sub_status / follow_ups / tags`）是后台工作台用的，比小程序对接更早，
 > 当初只在开发机手工 `ALTER` 过、没写进任何脚本。**线上库缺这三列时的症状很容易误判：**
@@ -136,9 +160,10 @@ curl -s http://127.0.0.1:3000/api/mini/orders; echo
 | POST | `/api/mini/orders` | Bearer | 下单；`clientOrderNo` 幂等；金额与订单号服务端重算 |
 | GET | `/api/mini/orders?status=all` | Bearer | 只返回当前 openid 的订单 + counts |
 | GET | `/api/mini/orders/[orderNo]` | Bearer | 订单详情（校验归属） |
-| POST | `/api/mini/orders/[orderNo]/cancel` | Bearer | 仅 `pending` 可取消 → `sub_status='已放弃'`（后台归入「已取消」页签） |
+| POST | `/api/mini/orders/[orderNo]/cancel` | Bearer | 仅 `pending` 可取消 → `sub_status='已放弃'` + 来源/原因/时间（后台进「客户取消订单 · 待处理」） |
 | POST | `/api/site/orders/lookup` | 手机号 + 姓名/公司名 | 官网「我的申请」查询（`/apply/lookup`）；逐行核验，不匹配的行不返回 |
-| POST | `/api/site/orders/cancel` | 手机号 + 姓名/公司名 | 官网自助取消，写入口径与小程序取消**完全一致** → 后台零改造 |
+| POST | `/api/site/orders/cancel` | 手机号 + 姓名/公司名 | 官网自助取消，写入口径与小程序取消**完全一致**（可选 `{ reason }`） |
+| POST | `/api/admin/leads/[id]/cancel` | `admin_auth` cookie | 后台处理取消单：`{ result, note? }` → `handle_status/handle_result/handled_at` + `follow_ups`；`result='已回访挽回'` 时把订单复活回「待处理」 |
 
 统一响应：`{ code, msg, data }`，`code === 0` 成功；`401` 令牌失效（小程序自动重登重试）。
 
@@ -153,8 +178,16 @@ curl -s http://127.0.0.1:3000/api/mini/orders; echo
 - 可取消范围：只有 `待确认`（`status` ∈ `pending/new` 且 `sub_status` ≠ 已放弃）。
   已受理 / 已完成 一律回「请联系客服 138 8078 8802 取消」。
 - 写入：`sub_status='已放弃'` + `tags` 追加「用户取消」+ 一条 `follow_ups`
-  「[用户取消] 客户在官网「我的申请」自助取消（申请编号 WKxxxxxx）」，主状态 `status` 不动
-  —— 与小程序取消同口径，所以后台四个页签、详情页提示都不用改。
+  「[用户取消] 客户在官网「我的申请」自助取消（申请编号 WKxxxxxx），原因：xxx」，主状态 `status` 不动；
+  同时写「客户取消订单」模块要的几列：`cancel_source='官网'`、`cancel_reason`（客户选填，见下）、
+  `cancel_note`（选「其他原因」时补的原话）、`cancel_at`，`handle_status` 留空 = 未处理
+  → 后台 `/admin/cancellations` 会出现这张单并计入红点，卡片上「原因」与「客户补充的原因」一起显示。
+- 取消原因（选填，不拦取消）：`价格原因 / 已选别家 / 暂时不做 / 不想要了 / 信息填错 / 重复提交 / 其他原因`
+  （白名单在 `lib/lead-status.ts` 的 `CANCEL_REASONS`，后台原因分布统计只认这几个值，
+  客户随便传的值一律当成「未填写原因」）。小程序端同一份原因清单，取消接口可选传 `{ reason }`。
+- 只有「其他原因」会就地展开一个输入框，客户补的那句话走 `reasonNote` 落 `cancel_note`：
+  **自由文本不进 `cancel_reason`**，否则原因分布会被每个人的措辞拆成几十档。
+  `/api/mini/orders/[orderNo]/cancel` 同样接收 `reasonNote`（小程序端当前用 ActionSheet，还没输入框）。
 - 申请编号：`WK` + 6 位补零的 `leads.id`（如 `WK000021`），仅供客户与客服对号；
   小程序订单号是 `WK` + 14 位时间戳，两者不会撞。
 

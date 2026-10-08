@@ -12,7 +12,7 @@
  * 额外多写一条 follow_ups 记录，客服在详情页能看到「谁、什么时候、从哪个口子撤的」。
  */
 import db from "@/lib/db";
-import { CANCELLED_SUB_STATUS, USER_CANCEL_TAG } from "@/lib/lead-status";
+import { CANCELLED_SUB_STATUS, USER_CANCEL_TAG, normalizeCancelNote, normalizeCancelReason } from "@/lib/lead-status";
 import { statusOf, statusText } from "@/lib/order-status";
 import { bjText, nowUtc, safeParse } from "@/lib/lead-utils";
 import { CONTACT_PHONE_DISPLAY } from "@/lib/site-contact";
@@ -144,6 +144,10 @@ export function cancelSiteOrder(input: {
     id: number;
     phone: string;
     keyword: string;
+    /** 客户选的取消原因（选填）：只入库做统计，不在白名单里的值一律当没填 */
+    reason?: unknown;
+    /** 选了「其他原因」之后补的那句话（选填）：落 cancel_note，后台卡片上显示原话 */
+    reasonNote?: unknown;
 }): CancelSiteOrderResult {
     const row = db.prepare("SELECT * FROM leads WHERE id = ?").get(input.id) as
         | LeadRow
@@ -169,19 +173,35 @@ export function cancelSiteOrder(input: {
     const tags = safeParse<string[]>(row.tags, []);
     if (!tags.includes(USER_CANCEL_TAG)) tags.push(USER_CANCEL_TAG);
 
+    // 取消原因：选填，白名单之外一律按「没填」处理（后台原因分布统计只认这几个值）
+    const reason = normalizeCancelReason(input.reason);
+    // 「其他原因」后面那句话单独存一列：cancel_reason 要保持白名单值域，否则统计会被自由文本打散
+    const reasonNote = normalizeCancelNote(input.reasonNote);
+    const now = nowUtc();
+
     const followUps = safeParse<{ time: string; text: string }[]>(row.follow_ups, []);
     followUps.push({
-        time: bjText(nowUtc()),
-        text: `[用户取消] 客户在官网「我的申请」自助取消（申请编号 ${siteOrderNo(row.id)}）`,
+        time: bjText(now),
+        text: `[用户取消] 客户在官网「我的申请」自助取消（申请编号 ${siteOrderNo(row.id)}）${
+            reason ? `，原因：${reason}` : ""
+        }${reasonNote ? `（客户补充：${reasonNote}）` : ""}`,
     });
 
+    // 除了小程序那套（sub_status + 标签），再补上「客户取消订单」模块要的三列：
+    // 来源 / 原因 / 取消时间。handle_* 不写 = 未处理，后台红点会点出来让人跟一声。
     db.prepare(
-        "UPDATE leads SET sub_status = ?, tags = ?, follow_ups = ?, updated_at = ? WHERE id = ?"
+        `UPDATE leads SET
+            sub_status = ?, tags = ?, follow_ups = ?,
+            cancel_source = '官网', cancel_reason = ?, cancel_note = ?, cancel_at = ?, updated_at = ?
+         WHERE id = ?`
     ).run(
         CANCELLED_SUB_STATUS,
         JSON.stringify(tags),
         JSON.stringify(followUps),
-        nowUtc(),
+        reason,
+        reasonNote,
+        now,
+        now,
         row.id
     );
 

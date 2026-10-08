@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import StatusBadge from "@/components/StatusBadge";
+import CheckIcon from "@/components/CheckIcon";
 import { isCancelled } from "@/lib/lead-status";
 
 type Lead = {
@@ -218,14 +219,15 @@ export default function LeadWorkspace({
                             <button
                                 key={s.value}
                                 type="button"
+                                aria-pressed={status === s.value}
                                 onClick={() => {
                                     setStatus(s.value);
                                     setSubStatus("");
                                 }}
-                                className={`px-5 py-2 rounded-xl text-sm font-medium transition-all ${
+                                className={`rounded-xl border px-5 py-2 text-sm font-medium transition-colors duration-150 ${
                                     status === s.value
-                                        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20"
-                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                        ? "border-orange-600 bg-orange-600 text-white shadow-sm shadow-orange-600/25 hover:border-orange-700 hover:bg-orange-700"
+                                        : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
                                 }`}
                             >
                                 {s.label}
@@ -245,13 +247,15 @@ export default function LeadWorkspace({
                                 <button
                                     key={s}
                                     type="button"
+                                    aria-pressed={subStatus === s}
                                     onClick={() => setSubStatus(subStatus === s ? "" : s)}
-                                    className={`px-4 py-2 rounded-xl text-sm transition-all ${
+                                    className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
                                         subStatus === s
-                                            ? "bg-orange-100 text-orange-600 font-medium"
-                                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                            ? "border-orange-500 bg-orange-500 text-white shadow-sm shadow-orange-500/25 hover:border-orange-600 hover:bg-orange-600"
+                                            : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
                                     }`}
                                 >
+                                    <CheckIcon on={subStatus === s} />
                                     {s}
                                 </button>
                             ))}
@@ -270,13 +274,14 @@ export default function LeadWorkspace({
                                 key={tag}
                                 type="button"
                                 onClick={() => toggleTag(tag)}
-                                className={`px-4 py-2 rounded-xl text-sm transition-all ${
+                                aria-pressed={tags.includes(tag)}
+                                className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-medium transition-colors duration-150 ${
                                     tags.includes(tag)
-                                        ? "bg-orange-100 text-orange-600 font-medium"
-                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                        ? "border-orange-500 bg-orange-500 text-white shadow-sm shadow-orange-500/25 hover:border-orange-600 hover:bg-orange-600"
+                                        : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
                                 }`}
                             >
-                                {tags.includes(tag) ? "✓ " : ""}
+                                <CheckIcon on={tags.includes(tag)} />
                                 {tag}
                             </button>
                         ))}
@@ -293,14 +298,14 @@ export default function LeadWorkspace({
                         onChange={(e) => setNote(e.target.value)}
                         rows={3}
                         placeholder="例如：客户说下周再谈、已发送报价单、需要上门测量等"
-                        className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition-all duration-200 resize-none"
+                        className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100/50 transition duration-150 resize-none"
                     />
                 </div>
 
                 <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold hover:bg-orange-700 transition-all disabled:opacity-50"
+                    className="w-full rounded-2xl bg-orange-600 py-4 text-white font-semibold transition-colors duration-150 hover:bg-orange-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {loading ? "保存中..." : "保存更新"}
                 </button>

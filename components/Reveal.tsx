@@ -88,7 +88,7 @@ export default function Reveal({
     return (
         <div
             ref={ref}
-            className={`transition-all duration-[1200ms] ease-out ${
+            className={`transition-[opacity,transform] duration-500 ease-out ${
                 hidden
                     ? "opacity-0 translate-y-12"
                     : "opacity-100 translate-y-0"
